@@ -1,8 +1,8 @@
 moodle-auth-db_salt
 ===================
 
-This is fork of the Moodle Exteranl Database Authentication Plugin to use External Databases which use a salt.
+This is fork of the Moodle External Database Authentication Plugin in order to use External Databases which use a salt.
 
 
 
-Work done at the Royal Veterinary College
+Copyright 2013  Royal Veterinary College
