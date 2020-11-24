@@ -511,7 +511,7 @@ class auth_plugin_db_salt extends auth_plugin_base {
     }
 
     /**
-     * will update a local user record from an external source.
+     * Update a local user record from an external source.
      * is a lighter version of the one in moodlelib -- won't do
      * expensive ops such as enrolment.
      *
@@ -520,19 +520,24 @@ class auth_plugin_db_salt extends auth_plugin_base {
      *
      * @param string $username username
      * @param bool $updatekeys
-     * @return stdClass
+     * @param bool $triggerevent set false if user_updated event should not be triggered.
+     *              This will not affect user_password_updated event triggering. note:ignored here!
+     * @param bool $suspenduser Should the user be suspended?  note: ignored here!
+     * @return stdClass|bool updated user record or false if there is no new info to update.
      */
-    function update_user_record($username, $updatekeys=false) {
+    function update_user_record($username, $updatekeys=false, $triggerevent = false, $suspenduser = false) {
         global $CFG, $DB;
+
+        require_once($CFG->dirroot.'/user/profile/lib.php');
 
         //just in case check text case
         $username = trim(core_text::strtolower($username));
 
-        // get the current user record
-        $user = $DB->get_record('user', array('username'=>$username, 'mnethostid'=>$CFG->mnet_localhost_id));
-        if (empty($user)) { // trouble
-            error_log("Cannot update non-existent user: $username");
-            print_error('auth_dbusernotexist','auth_db',$username);
+        // Get the current user record.
+        $user = $DB->get_record('user', array('username' => $username, 'mnethostid' => $CFG->mnet_localhost_id));
+        if (empty($user)) { // Trouble.
+            error_log($this->errorlogtag . get_string('auth_usernotexist', 'auth', $username));
+            print_error('auth_usernotexist', 'auth', '', $username);
             die;
         }
 
